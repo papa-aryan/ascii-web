@@ -1,0 +1,212 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    color: white;
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Courier New', monospace;
+    font-weight: normal;
+}
+
+.cat-container {
+    position: absolute;
+    top: 40vh;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 16px;
+    line-height: 1;
+    white-space: pre;
+    z-index: 1;
+}
+
+.menu-container {
+    position: absolute;
+    top: calc(40vh + 100px); /* Cat position + offset */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 20px;
+    text-align: center;
+}
+
+.menu-text {
+    font-size: 16px;
+}
+
+.menu-text div {
+    margin: 48px 0;
+}
+
+.ascii-link {
+    text-decoration: none;
+    color: rgb(188, 219, 229);
+    display: block;
+    padding: 2px;
+    text-align: center;
+}
+
+.blog-posts .ascii-link {
+    color: rgb(196, 231, 196);
+}
+
+.ascii-link a {
+    text-decoration: none;
+    color: inherit; 
+    display: block;
+}
+
+.ascii-link:hover {
+    cursor: pointer;
+    transform: scale(1.26);
+    transition: transform 0.2s ease;
+
+}
+
+/* blogpost css */
+
+.blog-post-container {
+    position: absolute;
+    top: calc(40vh + 150px);
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 800px;
+    padding: 20px;
+    text-align: left;
+}
+
+.blog-content {
+    font-family: 'Courier New', monospace;
+    line-height: 1.6;
+}
+
+.post-meta {
+    opacity: 0.7;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.post-body p {
+    margin: 15px 0;
+    white-space: pre-line;
+
+}
+
+.post-body h2, .post-body h3 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.post-body em {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.post-body code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+
+/* writer css */
+.writer-container {
+    position: absolute;
+    top: calc(40vh + 100px);
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 1000px;
+    width: 90%;
+    padding: 20px;
+    text-align: left;
+}
+
+.writer-header {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.writer-controls {
+    margin: 20px 0;
+}
+
+#post-title {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.writer-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.writer-buttons button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 8px 15px;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.writer-buttons button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.writer-editor {
+    margin-bottom: 30px;
+}
+
+#post-content {
+    width: 100%;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.writer-preview {
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+#preview-content {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    min-height: 200px;
+    white-space: pre-line;
+}
+
+#drafts-select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+#drafts-select option {
+    background: black;
+    color: white;
+}

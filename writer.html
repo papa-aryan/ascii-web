@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>writer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="cat-container">
+        <div id="cat"></div>
+    </div>
+    
+    <div class="writer-container">
+        <div class="writer-header">
+            <h2>post writer</h2>
+            <div class="writer-controls">
+
+                <select id="drafts-select">
+                    <option value="">New Draft</option>
+                </select>
+            
+                <input type="text" id="post-title" placeholder="Post title..." />
+                
+                <div class="writer-buttons">
+                    <button id="save-draft">save draft</button>
+                    <button id="delete-draft">delete draft</button>
+                    <button id="publish-post">publish</button>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="writer-editor">
+            <textarea id="post-content" placeholder="Write your post here..."></textarea>
+        </div>
+        
+        <div class="writer-preview">
+            <h3>preview:</h3>
+            <div id="preview-content"></div>
+        </div>
+        
+        <div class="ascii-link">
+            <a href="blog.html">← back to blog</a>
+        </div>
+    </div>
+    
+    <script src="ascii-cat.js"></script>
+    <script src="colors.js"></script>
+    <script src="writer.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

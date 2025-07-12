@@ -1,0 +1,300 @@
+class BlogWriter {
+    constructor() {
+        this.titleInput = document.getElementById('post-title');
+        this.contentTextarea = document.getElementById('post-content');
+        this.previewDiv = document.getElementById('preview-content');
+        this.draftsSelect = document.getElementById('drafts-select');
+        this.currentDraftId = null;
+        
+        if (!this.titleInput) return;
+        
+        this.initializeEventListeners();
+        this.loadDraftsList();
+    }
+    
+    initializeEventListeners() {
+        // Real-time preview
+        this.contentTextarea.addEventListener('input', () => this.updatePreview());
+        this.titleInput.addEventListener('input', () => this.updatePreview());
+        
+        // Draft selection
+        if (this.draftsSelect) {
+            this.draftsSelect.addEventListener('change', () => this.onDraftSelect());
+        }
+        
+        // Buttons
+        document.getElementById('save-draft').addEventListener('click', () => this.saveDraft());
+        document.getElementById('delete-draft').addEventListener('click', () => this.deleteDraft());
+        document.getElementById('publish-post').addEventListener('click', () => this.publishPost());
+        
+        // Auto-save every 30 seconds
+        setInterval(() => this.autoSave(), 30000);
+    }
+    
+    async loadDraftsList() {
+        try {
+            const response = await fetch('/api/drafts');
+            const drafts = await response.json();
+            
+            // Clear and populate dropdown
+            this.draftsSelect.innerHTML = '<option value="">New Draft</option>';
+            drafts.forEach(draft => {
+                const option = document.createElement('option');
+                option.value = draft.id;
+                option.textContent = draft.title || `Draft ${draft.id}`;
+                this.draftsSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Failed to load drafts:', error);
+        }
+    }
+    
+    onDraftSelect() {
+        const draftId = this.draftsSelect.value;
+        if (!draftId) {
+            // New draft
+            this.currentDraftId = null;
+            this.titleInput.value = '';
+            this.contentTextarea.value = '';
+            this.updatePreview();
+        } else {
+            // Load selected draft
+            this.loadDraft(draftId);
+        }
+    }
+    
+    async loadDraft(draftId) {
+        // For now, we'll get the draft from the dropdown data
+        // In a full implementation, you'd fetch from server
+        const drafts = await this.getDraftsFromServer();
+        const draft = drafts.find(d => d.id == draftId);
+        
+        if (draft) {
+            this.currentDraftId = draft.id;
+            this.titleInput.value = draft.title;
+            this.contentTextarea.value = draft.content;
+            this.updatePreview();
+        }
+    }
+    
+    async getDraftsFromServer() {
+        try {
+            const response = await fetch('/api/drafts');
+            return await response.json();
+        } catch (error) {
+            console.error('Failed to get drafts:', error);
+            return [];
+        }
+    }
+    
+    async saveDraft() {
+        const title = this.titleInput.value.trim();
+        const content = this.contentTextarea.value.trim();
+        
+        if (!title && !content) return;
+        
+        try {
+            const response = await fetch('/api/drafts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: title,
+                    content: content,
+                    id: this.currentDraftId
+                })
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                this.currentDraftId = result.id;
+                this.showMessage('Draft saved!');
+                this.loadDraftsList(); // Refresh the dropdown
+            }
+        } catch (error) {
+            this.showMessage('Failed to save draft');
+        }
+    }
+    
+    async deleteDraft() {
+        if (!this.currentDraftId) return;
+        
+        if (confirm('Delete this draft?')) {
+            try {
+                const response = await fetch(`/api/drafts/${this.currentDraftId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    this.currentDraftId = null;
+                    this.titleInput.value = '';
+                    this.contentTextarea.value = '';
+                    this.draftsSelect.value = '';
+                    this.updatePreview();
+                    this.loadDraftsList();
+                    this.showMessage('Draft deleted');
+                }
+            } catch (error) {
+                this.showMessage('Failed to delete draft');
+            }
+        }
+    }
+    
+    async autoSave() {
+        if ((this.titleInput.value.trim() || this.contentTextarea.value.trim()) && this.currentDraftId) {
+            await this.saveDraft();
+        }
+    }
+    
+    // Keep existing methods: updatePreview, publishPost, showMessage, etc.
+    updatePreview() {
+        const title = this.titleInput.value || 'Untitled Post';
+        let content = this.contentTextarea.value || 'Start writing...';
+        const currentDate = new Date().toISOString().split('T')[0];
+        
+        // Convert markdown formatting
+        content = this.parseMarkdown(content);
+
+        this.previewDiv.innerHTML = `
+            <h1>${title}</h1>
+            <div class="post-meta">
+                <span>posted: ${currentDate}</span>
+            </div>
+            <div class="post-body">
+                <p>${content}</p>
+            </div>
+        `;
+    }
+
+    parseMarkdown(text) {
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')              // *italic*
+            .replace(/\n/g, '<br>');                           // line breaks
+    }
+    
+    async publishPost() {
+        const title = this.titleInput.value.trim();
+        const content = this.contentTextarea.value.trim();
+        
+        if (!title || !content) {
+            this.showMessage('Please add both title and content!');
+            return;
+        }
+        
+        const filename = this.generateFilename(title);
+        const htmlContent = this.generatePostHTML(title, content);
+
+        try {
+            const response = await fetch('/api/publish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title,
+                    content,
+                    filename,
+                    htmlContent
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const result = await response.json();
+            if (result.success) {
+                this.showMessage('Post published successfully!');
+                if (confirm('Delete this draft?')) {
+                    this.deleteDraft();
+                }
+            } else {
+                this.showMessage(`Publish failed: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Publish error:', error);
+            this.showMessage('Failed to publish post');
+        }
+        
+        //this.copyToClipboard(htmlContent);
+        //this.showPublishInstructions(filename);
+    }
+    
+    generateFilename(title) {
+        return title.toLowerCase()
+                   .replace(/[^a-z0-9\s]/g, '')
+                   .replace(/\s+/g, '-')
+                   .substring(0, 50) + '.html';
+    }
+    
+    generatePostHTML(title, content) {
+        const currentDate = new Date().toISOString().split('T')[0];
+        content = this.parseMarkdown(content);
+        
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="cat-container">
+        <div id="cat"></div>
+    </div>
+    
+    <div class="blog-post-container">
+        <div class="blog-content">
+            <h1>${title}</h1>
+            <div class="post-meta">
+                <span>posted: ${currentDate}</span>
+            </div>
+            
+            <div class="post-body">
+                <p>${content}</p>
+            </div>
+            
+            <div class="ascii-link">
+                <a href="../blog.html">← back to blog</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../ascii-cat.js"></script>
+    <script src="../colors.js"></script>
+    <script src="../app.js"></script>
+</body>
+</html>`;
+    }
+    
+    copyToClipboard(text) {
+        navigator.clipboard.writeText(text);
+    }
+    
+    showPublishInstructions(filename) {
+        const instructions = `Post HTML copied to clipboard!\n\nTo publish:\n1. Create: blogposts/${filename}\n2. Paste HTML\n3. Add link to blog.html\n\nDelete this draft?`;
+        
+        if (confirm(instructions)) {
+            this.deleteDraft();
+        }
+    }
+    
+    showMessage(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        messageDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 255, 0, 0.2);
+            color: lime;
+            padding: 10px;
+            border: 1px solid lime;
+            font-family: 'Courier New', monospace;
+            z-index: 1000;
+        `;
+        
+        document.body.appendChild(messageDiv);
+        setTimeout(() => messageDiv.remove(), 3000);
+    }
+}
