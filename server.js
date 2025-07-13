@@ -59,6 +59,31 @@ class BlogServer {
                 }
             });
         });
+
+        // Save or update draft
+        this.app.post('/api/drafts', (req, res) => {
+            const { title, content, id } = req.body;
+            
+            if (id) {
+                // Update existing draft
+                this.db.updateDraft(id, title, content, (err) => {
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                    } else {
+                        res.json({ success: true, id });
+                    }
+                });
+            } else {
+                // Save new draft
+                this.db.saveDraft(title, content, (err, id) => {
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                    } else {
+                        res.json({ success: true, id });
+                    }
+                });
+            }
+        });
         
         // Save new draft
         this.app.post('/api/publish', (req, res) => {

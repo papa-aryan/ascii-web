@@ -4,9 +4,20 @@ class App {
     }
     
     initializeComponents() {
-        // Only initialize cat if element exists
+        // Initialize cat if element exists
         if (document.getElementById('cat')) {
             new ASCIICat();
+        }
+        
+        // Initialize duck if element exists
+        if (document.getElementById('duck')) {
+            const duck = new ASCIIDuck();
+            
+            // Enable duck movement only on the main blog page (not in posts)
+            const currentPage = window.location.pathname;
+            if (currentPage.endsWith('blog.html') || currentPage.endsWith('/blog')) {
+                duck.enableMovement();
+            }
         }
 
         // Initialize writer if on writer page

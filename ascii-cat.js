@@ -1,14 +1,9 @@
-class ASCIICat {
+class ASCIICat extends ASCIIArt {
     constructor() {
-        this.catElement = document.getElementById('cat');
-        if (!this.catElement) return; // Exit if no cat element
-        
-        this.isWaving = false;
-        this.render();
-        this.startAnimation();
+        super('cat'); // Pass the element ID to the parent constructor
     }
     
-    getCatArt(waving = false) {
+    getArt(waving = false) {
         const wave = waving ? '/' : ' ';
         const rightEar = waving ? '/' : '\\';
         return `
@@ -16,24 +11,6 @@ class ASCIICat {
   ( o.o ) 
     > ^ < ${wave} 
  /    ${rightEar}
- (______)
- 
-
-__
-  <(o )___
-   ( ._> /
-   \`---'
-`;
-    }
-    
-    render() {
-        this.catElement.innerHTML = this.getCatArt(this.isWaving);
-    }
-    
-    startAnimation() {
-        setInterval(() => {
-            this.isWaving = !this.isWaving;
-            this.render();
-        }, 1000);
+ (______)`;
     }
 }

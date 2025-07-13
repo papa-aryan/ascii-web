@@ -24,9 +24,21 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 1;
 }
 
+.duck-container {
+    position: absolute;
+ /* top: 30vh;  Different position than cat 
+    left: 40%; */
+    transform: translate(-50%, -50%); 
+    text-align: center;
+    font-size: 16px;
+    line-height: 1;
+    white-space: pre;
+    z-index: 1;
+}
+
 .menu-container {
     position: absolute;
-    top: calc(40vh + 100px); /* Cat position + offset */
+    top: calc(40vh + 70px); /* Cat position + offset */
     left: 50%;
     transform: translateX(-50%);
     padding: 20px;
@@ -43,14 +55,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .ascii-link {
     text-decoration: none;
-    color: rgb(188, 219, 229);
+    color: rgb(25, 180, 232);
     display: block;
     padding: 2px;
     text-align: center;
 }
 
 .blog-posts .ascii-link {
-    color: rgb(196, 231, 196);
+    color: rgb(26, 202, 26);
 }
 
 .ascii-link a {
@@ -70,7 +82,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .blog-post-container {
     position: absolute;
-    top: calc(40vh + 150px);
+    top: calc(40vh + 10px);
     left: 50%;
     transform: translateX(-50%);
     max-width: 800px;
