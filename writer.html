@@ -10,12 +10,18 @@
     <div class="cat-container">
         <div id="cat"></div>
     </div>
-    
+        
     <div class="writer-container">
         <div class="writer-header">
             <h2>post writer</h2>
+            
+            <!-- Add content type tabs -->
+            <div class="writer-tabs">
+                <div class="tab-button active" data-type="blog">blog post</div>
+                <div class="tab-button" data-type="mini">mini</div>
+            </div>
+            
             <div class="writer-controls">
-
                 <select id="drafts-select">
                     <option value="">New Draft</option>
                 </select>
@@ -27,9 +33,9 @@
                     <button id="delete-draft">delete draft</button>
                     <button id="publish-post">publish</button>
                 </div>
-
             </div>
         </div>
+
         
         <div class="writer-editor">
             <textarea id="post-content" placeholder="Write your post here..."></textarea>

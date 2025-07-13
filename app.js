@@ -25,6 +25,11 @@ class App {
             new BlogWriter();
         }
         
+        // Initialize mini manager on minis page
+        if (window.location.pathname.includes('minis.html')) {
+            new MinisManager();
+        }
+        
         // Always initialize random colors for links
         new RandomColors();
     }

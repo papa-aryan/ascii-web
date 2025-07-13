@@ -5,6 +5,7 @@ class BlogWriter {
         this.previewDiv = document.getElementById('preview-content');
         this.draftsSelect = document.getElementById('drafts-select');
         this.currentDraftId = null;
+        this.contentType = 'blog';
         
         if (!this.titleInput) return;
         
@@ -13,6 +14,11 @@ class BlogWriter {
     }
     
     initializeEventListeners() {
+        // Add tab selection handling
+        document.querySelectorAll('.tab-button').forEach(tab => {
+            tab.addEventListener('click', () => this.switchContentType(tab.dataset.type));
+        });
+        
         // Real-time preview
         this.contentTextarea.addEventListener('input', () => this.updatePreview());
         this.titleInput.addEventListener('input', () => this.updatePreview());
@@ -30,10 +36,28 @@ class BlogWriter {
         // Auto-save every 30 seconds
         setInterval(() => this.autoSave(), 30000);
     }
+
+    switchContentType(type) {
+        // Update active tab
+        document.querySelectorAll('.tab-button').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.type === type);
+        });
+        
+        this.contentType = type;
+        
+        // Clear form when switching types
+        this.titleInput.value = '';
+        this.contentTextarea.value = '';
+        this.currentDraftId = null;
+        this.updatePreview();
+        
+        // Load drafts for the selected type
+        this.loadDraftsList();
+    }
     
     async loadDraftsList() {
         try {
-            const response = await fetch('/api/drafts');
+            const response = await fetch(`/api/drafts?type=${this.contentType}`);
             const drafts = await response.json();
             
             // Clear and populate dropdown
@@ -79,7 +103,7 @@ class BlogWriter {
     
     async getDraftsFromServer() {
         try {
-            const response = await fetch('/api/drafts');
+            const response = await fetch(`/api/drafts?type=${this.contentType}`);
             return await response.json();
         } catch (error) {
             console.error('Failed to get drafts:', error);
@@ -100,7 +124,8 @@ class BlogWriter {
                 body: JSON.stringify({
                     title: title,
                     content: content,
-                    id: this.currentDraftId
+                    id: this.currentDraftId,
+                    type: this.contentType
                 })
             });
             
@@ -182,28 +207,33 @@ class BlogWriter {
             return;
         }
         
-        const filename = this.generateFilename(title);
-        const htmlContent = this.generatePostHTML(title, content);
-
         try {
+            // Prepare request data based on content type
+            const requestData = {
+                title,
+                content,
+                type: this.contentType
+            };
+            
+            // For blog posts, generate HTML content
+            if (this.contentType === 'blog') {
+                requestData.filename = this.generateFilename(title);
+                requestData.htmlContent = this.generatePostHTML(title, content);
+            }
+            
             const response = await fetch('/api/publish', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title,
-                    content,
-                    filename,
-                    htmlContent
-                })
+                body: JSON.stringify(requestData)
             });
 
-            if (!response.ok) {
+                        if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
             
             const result = await response.json();
             if (result.success) {
-                this.showMessage('Post published successfully!');
+                this.showMessage(`${this.contentType === 'blog' ? 'Post' : 'Mini'} published successfully!`);
                 if (confirm('Delete this draft?')) {
                     this.deleteDraft();
                 }
@@ -212,12 +242,10 @@ class BlogWriter {
             }
         } catch (error) {
             console.error('Publish error:', error);
-            this.showMessage('Failed to publish post');
+            this.showMessage('Failed to publish');
         }
-        
-        //this.copyToClipboard(htmlContent);
-        //this.showPublishInstructions(filename);
     }
+
     
     generateFilename(title) {
         return title.toLowerCase()
@@ -266,18 +294,6 @@ class BlogWriter {
     <script src="../app.js"></script>
 </body>
 </html>`;
-    }
-    
-    copyToClipboard(text) {
-        navigator.clipboard.writeText(text);
-    }
-    
-    showPublishInstructions(filename) {
-        const instructions = `Post HTML copied to clipboard!\n\nTo publish:\n1. Create: blogposts/${filename}\n2. Paste HTML\n3. Add link to blog.html\n\nDelete this draft?`;
-        
-        if (confirm(instructions)) {
-            this.deleteDraft();
-        }
     }
     
     showMessage(message) {
