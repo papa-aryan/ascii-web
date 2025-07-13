@@ -103,8 +103,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .post-body p {
     margin: 15px 0;
-    white-space: pre-line;
-
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .post-body h2, .post-body h3 {
@@ -294,6 +296,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .mini-modal-content {
     padding: 30px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .mini-modal-close {

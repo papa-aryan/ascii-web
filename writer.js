@@ -7,6 +7,10 @@ class BlogWriter {
         this.currentDraftId = null;
         this.contentType = 'blog';
         
+        // Initialize text formatters for different content types
+        this.blogFormatter = TextFormatter.forBlogPosts();
+        this.miniFormatter = TextFormatter.forMinis();
+        
         if (!this.titleInput) return;
         
         this.initializeEventListeners();
@@ -177,8 +181,9 @@ class BlogWriter {
         let content = this.contentTextarea.value || 'Start writing...';
         const currentDate = new Date().toISOString().split('T')[0];
         
-        // Convert markdown formatting
-        content = this.parseMarkdown(content);
+        // Use the appropriate formatter based on content type
+        const formatter = this.contentType === 'blog' ? this.blogFormatter : this.miniFormatter;
+        const formattedContent = formatter.format(content);
 
         this.previewDiv.innerHTML = `
             <h1>${title}</h1>
@@ -186,17 +191,13 @@ class BlogWriter {
                 <span>posted: ${currentDate}</span>
             </div>
             <div class="post-body">
-                <p>${content}</p>
+                ${formattedContent}
             </div>
         `;
     }
 
-    parseMarkdown(text) {
-        return text
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')              // *italic*
-            .replace(/\n/g, '<br>');                           // line breaks
-    }
+    // parseMarkdown method has been replaced by TextFormatter class
+    // See text-formatter.js for improved text formatting with word wrapping
     
     async publishPost() {
         const title = this.titleInput.value.trim();
@@ -256,7 +257,9 @@ class BlogWriter {
     
     generatePostHTML(title, content) {
         const currentDate = new Date().toISOString().split('T')[0];
-        content = this.parseMarkdown(content);
+        
+        // Use the blog formatter for generating HTML
+        const formattedContent = this.blogFormatter.format(content);
         
         return `<!DOCTYPE html>
 <html lang="en">
@@ -279,7 +282,7 @@ class BlogWriter {
             </div>
             
             <div class="post-body">
-                <p>${content}</p>
+                ${formattedContent}
             </div>
             
             <div class="ascii-link">
@@ -288,6 +291,7 @@ class BlogWriter {
         </div>
     </div>
     
+    <script src="../text-formatter.js"></script>
     <script src="../ascii-art.js"></script>
     <script src="../ascii-duck.js"></script>
     <script src="../colors.js"></script>

@@ -1,5 +1,6 @@
 class MinisManager {
     constructor() {
+        this.miniFormatter = TextFormatter.forMinis();
         this.createModalElement();
         this.initEventListeners();
         this.loadMinisList();
@@ -104,7 +105,7 @@ class MinisManager {
                         <span>posted: ${new Date(mini.created_at).toISOString().split('T')[0]}</span>
                     </div>
                     <div class="post-body">
-                        <p>${this.parseMarkdown(mini.content)}</p>
+                        ${this.miniFormatter.format(mini.content)}
                     </div>
                 `;
                 
@@ -122,10 +123,6 @@ class MinisManager {
         setTimeout(() => this.modalOverlay.classList.remove('active'), 300);
     }
     
-    parseMarkdown(text) {
-        return text
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')              // *italic*
-            .replace(/\n/g, '<br>');                           // line breaks
-    }
+    // parseMarkdown method has been replaced by TextFormatter class
+    // See text-formatter.js for improved text formatting with word wrapping
 }
