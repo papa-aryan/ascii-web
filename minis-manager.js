@@ -110,7 +110,10 @@ class MinisManager {
                 
                 // Show modal
                 this.modalOverlay.classList.add('active');
-                setTimeout(() => this.modal.classList.add('active'), 10);
+                setTimeout(() => {
+                    this.modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }, 10);
             }
         } catch (error) {
             console.error('Failed to load mini:', error);
@@ -118,6 +121,7 @@ class MinisManager {
     }
     
     closeModal() {
+        document.body.style.overflow = '';
         this.modal.classList.remove('active');
         setTimeout(() => this.modalOverlay.classList.remove('active'), 300);
     }
@@ -125,7 +129,6 @@ class MinisManager {
     parseMarkdown(text) {
         return text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')              // *italic*
-            .replace(/\n/g, '<br>');                           // line breaks
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');              // *italic*
     }
 }

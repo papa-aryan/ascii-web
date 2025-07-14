@@ -85,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
     top: calc(40vh + 10px);
     left: 50%;
     transform: translateX(-50%);
-    max-width: 800px;
+    max-width: 80ch;
     padding: 20px;
     text-align: left;
 }
@@ -103,8 +103,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .post-body p {
     margin: 15px 0;
-    white-space: pre-line;
-
+    white-space: break-spaces;
+    overflow-wrap: break-word;
+    text-align: center;
 }
 
 .post-body h2, .post-body h3 {
@@ -204,7 +205,9 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 15px;
     min-height: 200px;
-    white-space: pre-line;
+    white-space: break-spaces;
+    overflow-wrap: break-word;
+    text-align: center;
 }
 
 #drafts-select {
@@ -283,7 +286,8 @@ h1, h2, h3, h4, h5, h6 {
     color: white;
     font-family: 'Courier New', monospace;
     position: relative;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     transform: scale(0.9);
     transition: transform 0.3s;
 }
@@ -292,8 +296,24 @@ h1, h2, h3, h4, h5, h6 {
     transform: scale(1);
 }
 
+/* Custom Scrollbar for Mini Modal */
+.mini-modal::-webkit-scrollbar {
+    width: 10px;
+}
+
+.mini-modal::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.mini-modal::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
 .mini-modal-content {
     padding: 30px;
+    max-width: 80ch;
+    margin: 0 auto;
 }
 
 .mini-modal-close {

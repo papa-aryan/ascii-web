@@ -194,8 +194,7 @@ class BlogWriter {
     parseMarkdown(text) {
         return text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')              // *italic*
-            .replace(/\n/g, '<br>');                           // line breaks
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');              // *italic*
     }
     
     async publishPost() {
