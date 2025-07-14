@@ -33,12 +33,12 @@ ${wing}
         } else {
             // On blog post pages - position on left side
             xMin = 15;
-            xMax = 35;
+            xMax = 45;
         }
         
         // Random initial position within allowed bounds
         const randomX = xMin + Math.random() * (xMax - xMin);
-        const randomY = 10 + Math.random() * 40; // Between 10-50vh
+        const randomY = 10 + Math.random() * 30; // Between 10-50vh
         
         // Set initial position
         container.style.top = `${randomY}vh`;
