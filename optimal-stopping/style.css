@@ -1,0 +1,111 @@
+body {
+    background-color: black;
+    color: white;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    padding: 20px;
+}
+
+h1, h2 {
+    font-weight: normal;
+}
+
+.controls {
+    margin-bottom: 20px;
+}
+
+.controls label {
+    margin-right: 10px;
+}
+
+.controls input[type="range"] {
+    width: 200px;
+}
+
+.controls button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 8px 15px;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.controls button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#visualization-container {
+    margin-bottom: 20px;
+}
+
+#candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid white;
+    min-height: 100px;
+}
+
+.candidate {
+    border: 1px solid white;
+    padding: 10px;
+    text-align: center;
+}
+
+#results-container {
+    text-align: left;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid white;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 150px;
+    height: 10px;
+    background: #222;
+    outline: none;
+    border: 1px solid #0f0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #0f0;
+    cursor: pointer;
+    border: 1px solid #0f0;
+}
+
+#status-container {
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    min-height: 1.5em;
+}
+
+.candidate.sample {
+    background-color: #333;
+}
+
+.candidate.best-in-sample {
+    background-color: #555;
+}
+
+.candidate.current {
+    outline: 2px solid cyan;
+    transform: scale(1.1);
+}
+
+.candidate.chosen {
+    background-color: green;
+}
+
+.candidate.best {
+    border-color: gold;
+    border-width: 2px;
+}

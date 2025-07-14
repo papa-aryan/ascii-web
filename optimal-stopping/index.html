@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimal Stopping</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Optimal Stopping Problem (Secretary Problem)</h1>
+    <div class="controls">
+        <label for="num-candidates">Number of Candidates (n):</label>
+        <input type="range" id="num-candidates" name="num-candidates" min="10" max="500" value="50" step="10">
+        <span id="candidates-value">50</span>
+    </div>
+    <div class="controls">
+        <label for="animation-speed">Animation Speed:</label>
+        <input type="range" id="animation-speed" name="animation-speed" min="10" max="510" value="160" step="50">
+    </div>
+    <div class="controls">
+        <button id="run-simulation-button">Run Simulation</button>
+    </div>
+    <div id="status-container"></div>
+    <div id="visualization-container">
+        <div id="candidates-grid"></div>
+    </div>
+    <div id="results-container">
+        <h2>Results</h2>
+        <div id="results-output"></div>
+    </div>
+    <script src="script.js"></script>
+    <div class="controls" style="position: fixed; bottom: 10px; left: 10px;">
+        <button onclick="window.location.href='../index.html'">back to home</button>
+    </div>
+</body>
+</html>
