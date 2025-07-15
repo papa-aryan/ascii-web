@@ -4,13 +4,58 @@ class BlogWriter {
         this.contentTextarea = document.getElementById('post-content');
         this.previewDiv = document.getElementById('preview-content');
         this.draftsSelect = document.getElementById('drafts-select');
+        this.backLinkContainer = document.getElementById('back-link-container');
         this.currentDraftId = null;
         this.contentType = 'blog';
         
         if (!this.titleInput) return;
         
+        // Initialize with correct content type from URL
+        this.initializeFromURL();
         this.initializeEventListeners();
+        this.updateBackLink();
         this.loadDraftsList();
+    }
+    
+    /**
+     * Parse URL parameters and initialize the writer with the correct content type
+     */
+    initializeFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const typeFromURL = urlParams.get('type');
+        
+        if (typeFromURL && (typeFromURL === 'blog' || typeFromURL === 'journal')) {
+            this.contentType = typeFromURL;
+            this.setActiveTab(typeFromURL);
+        }
+    }
+    
+    /**
+     * Set the active tab in the UI based on content type
+     * @param {string} type - The content type ('blog' or 'journal')
+     */
+    setActiveTab(type) {
+        document.querySelectorAll('.tab-button').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.type === type);
+        });
+    }
+    
+    /**
+     * Update the back link text and href based on current content type
+     */
+    updateBackLink() {
+        if (!this.backLinkContainer) return;
+        
+        const backLinkAnchor = this.backLinkContainer.querySelector('a');
+        if (!backLinkAnchor) return;
+        
+        if (this.contentType === 'journal') {
+            backLinkAnchor.textContent = '← back to journals';
+            backLinkAnchor.href = 'journal.html';
+        } else {
+            backLinkAnchor.textContent = '← back to blog';
+            backLinkAnchor.href = 'blog.html';
+        }
     }
     
     initializeEventListeners() {
@@ -39,11 +84,12 @@ class BlogWriter {
 
     switchContentType(type) {
         // Update active tab
-        document.querySelectorAll('.tab-button').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.type === type);
-        });
+        this.setActiveTab(type);
         
         this.contentType = type;
+        
+        // Update the back link to reflect current content type
+        this.updateBackLink();
         
         // Clear form when switching types
         this.titleInput.value = '';
