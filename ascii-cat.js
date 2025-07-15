@@ -6,9 +6,10 @@ class ASCIICat extends ASCIIArt {
     getArt(waving = false) {
         const wave = waving ? '/' : ' ';
         const rightEar = waving ? '/' : '\\';
+        const hiText = waving ? 'hi' : '  ';
         return `
   /\\_/\\ 
-  ( o.o ) 
+    ( o.o ) ${hiText}
     > ^ < ${wave} 
  /    ${rightEar}
  (______)`;

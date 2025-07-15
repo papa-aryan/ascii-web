@@ -1,0 +1,120 @@
+/* Extras Section Styles - Maintains main site aesthetic */
+body {
+    background-color: #000000;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header-container {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.header-container h1 {
+    font-size: 2.5em;
+    margin: 0;
+    text-transform: lowercase;
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    font-size: 1.1em;
+    margin: 10px 0 0 0;
+    opacity: 0.8;
+}
+
+/* Projects Container */
+.projects-container {
+    flex: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.project-item {
+    border: 1px solid #00ff00;
+    border-radius: 0;
+    padding: 0;
+    transition: all 0.3s ease;
+    background-color: transparent;
+}
+
+.project-item:hover {
+    background-color: rgba(0, 255, 0, 0.1);
+    border-color: #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.project-link {
+    display: block;
+    padding: 20px;
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.project-link h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.4em;
+    text-transform: lowercase;
+    letter-spacing: 1px;
+}
+
+.project-description {
+    margin: 0;
+    opacity: 0.7;
+    font-size: 0.9em;
+}
+
+/* Navigation */
+.navigation {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.back-link a {
+    color: #00ff00;
+    text-decoration: none;
+    font-size: 1.1em;
+    padding: 10px 20px;
+    border: 1px solid #00ff00;
+    transition: all 0.3s ease;
+}
+
+.back-link a:hover {
+    background-color: rgba(0, 255, 0, 0.1);
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 15px;
+    }
+    
+    .header-container h1 {
+        font-size: 2em;
+    }
+    
+    .project-link {
+        padding: 15px;
+    }
+    
+    .project-link h3 {
+        font-size: 1.2em;
+    }
+} 
