@@ -14,8 +14,8 @@ class ContentPublisher {
 
         if (type === 'blog') {
             this.publishBlogPost(title, content, callback);
-        } else if (type === 'mini') {
-            this.publishMini(title, content, callback);
+        } else if (type === 'journal') {
+            this.publishJournal(title, content, callback);
         } else {
             callback(new Error('Invalid content type'));
         }
@@ -48,8 +48,8 @@ class ContentPublisher {
         }
     }
 
-    publishMini(title, content, callback) {
-        this.db.publishMini(title, content, (err, id) => {
+    publishJournal(title, content, callback) {
+        this.db.publishJournal(title, content, (err, id) => {
             if (err) {
                 return callback(err);
             }
@@ -149,7 +149,7 @@ class BlogServer {
             }
         });        
 
-        // Update publish endpoint to handle minis
+        // Update publish endpoint to handle journals
         this.app.post('/api/publish', (req, res) => {
             this.publisher.publish(req.body, (err, result) => {
                 if (err) {
@@ -160,33 +160,33 @@ class BlogServer {
             });
         });
 
-        // Get all published minis
-        this.app.get('/api/minis', (req, res) => {
-            this.db.getAllPublishedMinis((err, minis) => {
+        // Get all published journals
+        this.app.get('/api/journals', (req, res) => {
+            this.db.getAllPublishedJournals((err, journals) => {
                 if (err) {
                     res.status(500).json({ error: err.message });
                 } else {
-                    res.json(minis);
+                    res.json(journals);
                 }
             });
         });
 
-        // Get specific mini by ID
-        this.app.get('/api/minis/:id', (req, res) => {
-            this.db.getMini(req.params.id, (err, mini) => {
+        // Get specific journal by ID
+        this.app.get('/api/journals/:id', (req, res) => {
+            this.db.getJournal(req.params.id, (err, journal) => {
                 if (err) {
                     res.status(500).json({ error: err.message });
-                } else if (!mini) {
-                    res.status(404).json({ error: 'Mini not found' });
+                } else if (!journal) {
+                    res.status(404).json({ error: 'Journal not found' });
                 } else {
-                    res.json(mini);
+                    res.json(journal);
                 }
             });
         });
 
-        // Delete published mini
-        this.app.delete('/api/minis/:id', (req, res) => {
-            this.db.deleteMini(req.params.id, (err) => {
+        // Delete published journal
+        this.app.delete('/api/journals/:id', (req, res) => {
+            this.db.deleteJournal(req.params.id, (err) => {
                 if (err) {
                     res.status(500).json({ error: err.message });
                 } else {

@@ -65,7 +65,7 @@ h1, h2, h3, h4, h5, h6 {
     color: rgb(26, 202, 26);
 }
 
-.minis-links .ascii-link {
+.journals-links .ascii-link {
     color: rgb(200, 80, 255);
 }
 
@@ -258,9 +258,9 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: -1px;
 }
 
-/* Mini Modal Styles */
+/* Journal Modal Styles */
 
-.mini-modal-overlay {
+.journal-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -276,12 +276,12 @@ h1, h2, h3, h4, h5, h6 {
     transition: opacity 0.3s, visibility 0.3s;
 }
 
-.mini-modal-overlay.active {
+.journal-modal-overlay.active {
     opacity: 1;
     visibility: visible;
 }
 
-.mini-modal {
+.journal-modal {
     width: 80%;
     max-width: 800px;
     max-height: 80vh;
@@ -296,32 +296,32 @@ h1, h2, h3, h4, h5, h6 {
     transition: transform 0.3s;
 }
 
-.mini-modal.active {
+.journal-modal.active {
     transform: scale(1);
 }
 
-/* Custom Scrollbar for Mini Modal */
-.mini-modal::-webkit-scrollbar {
+/* Custom Scrollbar for Journal Modal */
+.journal-modal::-webkit-scrollbar {
     width: 10px;
 }
 
-.mini-modal::-webkit-scrollbar-track {
+.journal-modal::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.5);
 }
 
-.mini-modal::-webkit-scrollbar-thumb {
+.journal-modal::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-.mini-modal-content {
+.journal-modal-content {
     padding: 30px;
     max-width: 80ch;
     margin: 0 auto;
     text-align: center;
 }
 
-.mini-modal-close {
+.journal-modal-close {
     position: absolute;
     top: 10px;
     right: 15px;
@@ -330,12 +330,12 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0.7;
 }
 
-.mini-modal-close:hover {
+.journal-modal-close:hover {
     opacity: 1;
 }
 
 /* ASCII Border Styling */
-.mini-modal::before {
+.journal-modal::before {
     content: "+--------------------------------------------------------------------------------+";
     display: block;
     white-space: pre;
@@ -343,7 +343,7 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(255, 255, 255, 0.5);
 }
 
-.mini-modal::after {
+.journal-modal::after {
     content: "+--------------------------------------------------------------------------------+";
     display: block;
     white-space: pre;

@@ -10,20 +10,20 @@ function printHelp() {
 Content Management Script
 -------------------------
 Usage:
-  node manage-content.js list <type>      - Lists all published posts of a type ('blog' or 'mini').
+  node manage-content.js list <type>      - Lists all published posts of a type ('blog' or 'journal').
   node manage-content.js delete <type> <id> - Deletes a specific post by its ID.
 
 Examples:
-  node manage-content.js list mini
-  node manage-content.js delete mini 12
+  node manage-content.js list journal
+  node manage-content.js delete journal 12
     `);
 }
 
 function listContent(contentType) {
-    if (contentType === 'mini') {
-        db.getAllPublishedMinis((err, items) => {
+    if (contentType === 'journal') {
+        db.getAllPublishedJournals((err, items) => {
             if (err) return console.error('Error:', err.message);
-            console.log(`--- Published Minis ---`);
+            console.log(`--- Published Journals ---`);
             items.forEach(item => console.log(`ID: ${item.id}, Title: ${item.title}`));
             db.close();
         });
@@ -40,13 +40,13 @@ function deleteContent(contentType, contentId) {
         return;
     }
 
-    if (contentType === 'mini') {
-        db.deleteMini(contentId, function(err) {
+    if (contentType === 'journal') {
+        db.deleteJournal(contentId, function(err) {
             if (err) return console.error('Error:', err.message);
             if (this.changes === 0) {
-                console.log(`No mini found with ID ${contentId}.`);
+                console.log(`No journal found with ID ${contentId}.`);
             } else {
-                console.log(`Mini with ID ${contentId} has been deleted.`);
+                console.log(`Journal with ID ${contentId} has been deleted.`);
             }
             db.close();
         });

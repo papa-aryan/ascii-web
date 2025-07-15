@@ -1,27 +1,27 @@
-class MinisManager {
+class JournalManager {
     constructor() {
         this.createModalElement();
         this.initEventListeners();
-        this.loadMinisList();
+        this.loadJournalsList();
     }
     
     createModalElement() {
         // Create modal container
         this.modalOverlay = document.createElement('div');
-        this.modalOverlay.className = 'mini-modal-overlay';
+        this.modalOverlay.className = 'journal-modal-overlay';
         
         // Create modal content container
         this.modal = document.createElement('div');
-        this.modal.className = 'mini-modal';
+        this.modal.className = 'journal-modal';
         
         // Create close button
         this.closeButton = document.createElement('div');
-        this.closeButton.className = 'mini-modal-close';
+        this.closeButton.className = 'journal-modal-close';
         this.closeButton.textContent = '×';
         
         // Create content containers
         this.modalContent = document.createElement('div');
-        this.modalContent.className = 'mini-modal-content';
+        this.modalContent.className = 'journal-modal-content';
         
         // Assemble modal
         this.modal.appendChild(this.closeButton);
@@ -52,59 +52,59 @@ class MinisManager {
         });
     }
     
-    async loadMinisList() {
-        // Only run on the minis page
-        if (!window.location.pathname.includes('minis.html')) return;
+    async loadJournalsList() {
+        // Only run on the journal page
+        if (!window.location.pathname.includes('journal.html')) return;
         
         try {
-            // Fetch all published minis
-            const response = await fetch('/api/minis');
-            const minis = await response.json();
+            // Fetch all published journals
+            const response = await fetch('/api/journals');
+            const journals = await response.json();
             
             // Get the container to add links to
-            const minisContainer = document.querySelector('.minis-links');
+            const journalsContainer = document.querySelector('.journals-links');
             
-            if (minisContainer && minis.length > 0) {
-                minisContainer.innerHTML = ''; // Clear any existing content
+            if (journalsContainer && journals.length > 0) {
+                journalsContainer.innerHTML = ''; // Clear any existing content
                 
-                // Add mini links
-                minis.forEach(mini => {
-                    const miniLink = document.createElement('div');
-                    miniLink.className = 'ascii-link';
-                    miniLink.innerHTML = `<a href="#" data-mini-id="${mini.id}">${mini.title}</a>`;
+                // Add journal links
+                journals.forEach(journal => {
+                    const journalLink = document.createElement('div');
+                    journalLink.className = 'ascii-link';
+                    journalLink.innerHTML = `<a href="#" data-journal-id="${journal.id}">${journal.title}</a>`;
                     
                     // Add click event
-                    miniLink.querySelector('a').addEventListener('click', (e) => {
+                    journalLink.querySelector('a').addEventListener('click', (e) => {
                         e.preventDefault();
-                        this.openMini(mini.id);
+                        this.openJournal(journal.id);
                     });
                     
-                    minisContainer.appendChild(miniLink);
+                    journalsContainer.appendChild(journalLink);
                 });
             }
         } catch (error) {
-            console.error('Failed to load minis:', error);
+            console.error('Failed to load journals:', error);
         }
     }
     
-    async openMini(id) {
+    async openJournal(id) {
         try {
-            const response = await fetch(`/api/minis/${id}`);
+            const response = await fetch(`/api/journals/${id}`);
             if (!response.ok) {
                 throw new Error(`HTTP error ${response.status}`);
             }
             
-            const mini = await response.json();
+            const journal = await response.json();
             
-            if (mini) {
+            if (journal) {
                 // Set modal content
                 this.modalContent.innerHTML = `
-                    <h1>${mini.title}</h1>
+                    <h1>${journal.title}</h1>
                     <div class="post-meta">
-                        <span>posted: ${new Date(mini.created_at).toISOString().split('T')[0]}</span>
+                        <span>posted: ${new Date(journal.created_at).toISOString().split('T')[0]}</span>
                     </div>
                     <div class="post-body">
-                        <p>${this.parseMarkdown(mini.content)}</p>
+                        <p>${this.parseMarkdown(journal.content)}</p>
                     </div>
                 `;
                 
@@ -116,7 +116,7 @@ class MinisManager {
                 }, 10);
             }
         } catch (error) {
-            console.error('Failed to load mini:', error);
+            console.error('Failed to load journal:', error);
         }
     }
     

@@ -25,9 +25,9 @@ class App {
             new BlogWriter();
         }
         
-        // Initialize mini manager on minis page
-        if (window.location.pathname.includes('minis.html')) {
-            new MinisManager();
+        // Initialize journal manager on journal page
+        if (window.location.pathname.includes('journal.html')) {
+            new JournalManager();
         }
         
         // Always initialize random colors for links

@@ -226,7 +226,7 @@ class BlogWriter {
             
             const result = await response.json();
             if (result.success) {
-                this.showMessage(`${this.contentType === 'blog' ? 'Post' : 'Mini'} published successfully!`);
+                this.showMessage(`${this.contentType === 'blog' ? 'Post' : 'Journal'} published successfully!`);
                 if (this.currentDraftId && confirm('Delete this draft?')) {
                     this.deleteDraft();
                 }

@@ -91,29 +91,29 @@ class ContentDatabase {
         this.db.run(query, [id], callback);
     }
 
-    // Methods for published minis
-    publishMini(title, content, callback) {
-        const query = `INSERT INTO posts (title, content, type, status) VALUES (?, ?, 'mini', 'published')`;
+    // Methods for published journals
+    publishJournal(title, content, callback) {
+        const query = `INSERT INTO posts (title, content, type, status) VALUES (?, ?, 'journal', 'published')`;
         this.db.run(query, [title, content], function(err) {
             callback(err, this ? this.lastID : null);
         });
     }
 
-    // Get all published minis
-    getAllPublishedMinis(callback) {
-        const query = `SELECT * FROM posts WHERE status = 'published' AND type = 'mini' ORDER BY created_at DESC`;
+    // Get all published journals
+    getAllPublishedJournals(callback) {
+        const query = `SELECT * FROM posts WHERE status = 'published' AND type = 'journal' ORDER BY created_at DESC`;
         this.db.all(query, callback);
     }
 
-    // Get a specific mini by ID
-    getMini(id, callback) {
-        const query = `SELECT * FROM posts WHERE id = ? AND type = 'mini'`;
+    // Get a specific journal by ID
+    getJournal(id, callback) {
+        const query = `SELECT * FROM posts WHERE id = ? AND type = 'journal'`;
         this.db.get(query, [id], callback);
     }
 
-    // Delete a published mini
-    deleteMini(id, callback) {
-        const query = `DELETE FROM posts WHERE id = ? AND type = 'mini' AND status = 'published'`;
+    // Delete a published journal
+    deleteJournal(id, callback) {
+        const query = `DELETE FROM posts WHERE id = ? AND type = 'journal' AND status = 'published'`;
         this.db.run(query, [id], callback);
     }
 
