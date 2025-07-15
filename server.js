@@ -3,34 +3,97 @@ const ContentDatabase = require('./database/database.js');
 const fs = require('fs');
 const path = require('path');
 
-class BlogHTMLManager {
-    constructor(blogFilePath) {
-        this.blogFilePath = blogFilePath;
+class ContentPublisher {
+    constructor(db) {
+        this.db = db;
+        this.blogTemplatePath = path.join(__dirname, 'templates', 'blog-post-template.html');
     }
-        
-    addPostToTop(filename, title) {
-        try {
-            const blogContent = fs.readFileSync(this.blogFilePath, 'utf8');
-            const newPostHtml = `<div class="ascii-link"><a href="blogposts/${filename}">${title}</a></div>`;
-            
-            // Find the blog-posts div and first post
-            const blogPostsOpenTag = '<div class="blog-posts">';
-            const blogPostsStart = blogContent.indexOf(blogPostsOpenTag);
-            const afterOpenTag = blogPostsStart + blogPostsOpenTag.length;
-            const firstPostStart = blogContent.indexOf('<div class="ascii-link">', afterOpenTag);
-            
-            // Insert new post at the top
-            const updatedContent = 
-                blogContent.slice(0, firstPostStart) + 
-                newPostHtml + '\n                ' +
-                blogContent.slice(firstPostStart);
-            
-            fs.writeFileSync(this.blogFilePath, updatedContent);
-            return true;
-        } catch (error) {
-            console.error(`Error adding post to blog: ${error.message}`);
-            throw error;
+
+    publish(postData, callback) {
+        const { title, content, type } = postData;
+
+        if (type === 'blog') {
+            this.publishBlogPost(title, content, callback);
+        } else if (type === 'mini') {
+            this.publishMini(title, content, callback);
+        } else {
+            callback(new Error('Invalid content type'));
         }
+    }
+
+    publishBlogPost(title, content, callback) {
+        try {
+            const template = fs.readFileSync(this.blogTemplatePath, 'utf8');
+            const currentDate = new Date().toISOString().split('T')[0];
+            
+            const htmlContent = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+
+            const finalHtml = template
+                .replace(/{{TITLE}}/g, title)
+                .replace(/{{DATE}}/g, currentDate)
+                .replace(/{{CONTENT}}/g, htmlContent);
+
+            const filename = this.generateFilename(title);
+            const filePath = path.join(__dirname, 'blogposts', filename);
+            
+            fs.writeFileSync(filePath, finalHtml);
+            this.addPostToBlogList(filename, title);
+
+            callback(null, { success: true });
+        } catch (error) {
+            callback(error);
+        }
+    }
+
+    publishMini(title, content, callback) {
+        this.db.publishMini(title, content, (err, id) => {
+            if (err) {
+                return callback(err);
+            }
+            callback(null, { success: true, id });
+        });
+    }
+    
+    generateFilename(title) {
+        return title.toLowerCase()
+                   .replace(/[^a-z0-9\s]/g, '')
+                   .replace(/\s+/g, '-')
+                   .substring(0, 50) + '.html';
+    }
+
+    addPostToBlogList(filename, title) {
+        const blogFilePath = path.join(__dirname, 'blog.html');
+        const blogContent = fs.readFileSync(blogFilePath, 'utf8');
+        const newPostHtml = `                <div class="ascii-link"><a href="blogposts/${filename}">${title}</a></div>`;
+
+        const blogPostsOpenTag = '<div class="blog-posts">';
+        const blogPostsStart = blogContent.indexOf(blogPostsOpenTag);
+        
+        if (blogPostsStart === -1) {
+            throw new Error('Could not find blog posts container in blog.html');
+        }
+
+        const afterOpenTag = blogPostsStart + blogPostsOpenTag.length;
+        
+        const firstPostStart = blogContent.indexOf('<div class="ascii-link">', afterOpenTag);
+
+        let updatedContent;
+        if (firstPostStart !== -1) {
+            updatedContent = 
+                blogContent.slice(0, firstPostStart) + 
+                newPostHtml + '\n' +
+                blogContent.slice(firstPostStart);
+        } else {
+            updatedContent = 
+                blogContent.slice(0, afterOpenTag) + '\n' +
+                newPostHtml + '\n' +
+                blogContent.slice(afterOpenTag);
+        }
+        
+        fs.writeFileSync(blogFilePath, updatedContent);
     }
 }
 
@@ -38,7 +101,7 @@ class BlogServer {
     constructor() {
         this.app = express();
         this.db = new ContentDatabase();
-        this.blogManager = new BlogHTMLManager(path.join(__dirname, 'blog.html'));
+        this.publisher = new ContentPublisher(this.db);
         this.setupMiddleware();
         this.setupRoutes();
     }
@@ -88,32 +151,13 @@ class BlogServer {
 
         // Update publish endpoint to handle minis
         this.app.post('/api/publish', (req, res) => {
-            const { title, content, filename, htmlContent, type = 'blog' } = req.body;
-            
-            try {
-                if (type === 'blog') {
-                    // Existing blog post publishing logic
-                    const filePath = path.join(__dirname, 'blogposts', filename);
-                    fs.writeFileSync(filePath, htmlContent);
-                    
-                    this.blogManager.addPostToTop(filename, title);
-                    
-                    res.json({ success: true });
-                } else if (type === 'mini') {
-                    // Publish mini to database
-                    this.db.publishMini(title, content, (err, id) => {
-                        if (err) {
-                            res.status(500).json({ error: err.message });
-                        } else {
-                            res.json({ success: true, id });
-                        }
-                    });
+            this.publisher.publish(req.body, (err, result) => {
+                if (err) {
+                    res.status(500).json({ error: err.message });
                 } else {
-                    res.status(400).json({ error: 'Invalid content type' });
+                    res.json(result);
                 }
-            } catch (error) {
-                res.status(500).json({ error: error.message });
-            }
+            });
         });
 
         // Get all published minis

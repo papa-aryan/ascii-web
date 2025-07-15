@@ -214,26 +214,20 @@ class BlogWriter {
                 type: this.contentType
             };
             
-            // For blog posts, generate HTML content
-            if (this.contentType === 'blog') {
-                requestData.filename = this.generateFilename(title);
-                requestData.htmlContent = this.generatePostHTML(title, content);
-            }
-            
             const response = await fetch('/api/publish', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestData)
             });
 
-                        if (!response.ok) {
+            if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
             
             const result = await response.json();
             if (result.success) {
                 this.showMessage(`${this.contentType === 'blog' ? 'Post' : 'Mini'} published successfully!`);
-                if (confirm('Delete this draft?')) {
+                if (this.currentDraftId && confirm('Delete this draft?')) {
                     this.deleteDraft();
                 }
             } else {
@@ -243,56 +237,6 @@ class BlogWriter {
             console.error('Publish error:', error);
             this.showMessage('Failed to publish');
         }
-    }
-
-    
-    generateFilename(title) {
-        return title.toLowerCase()
-                   .replace(/[^a-z0-9\s]/g, '')
-                   .replace(/\s+/g, '-')
-                   .substring(0, 50) + '.html';
-    }
-    
-    generatePostHTML(title, content) {
-        const currentDate = new Date().toISOString().split('T')[0];
-        content = this.parseMarkdown(content);
-        
-        return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
-    <link rel="stylesheet" href="../styles.css">
-</head>
-<body>
-    <div class="duck-container">
-        <div id="duck"></div>
-    </div>
-    
-    <div class="blog-post-container">
-        <div class="blog-content">
-            <h1>${title}</h1>
-            <div class="post-meta">
-                <span>posted: ${currentDate}</span>
-            </div>
-            
-            <div class="post-body">
-                <p>${content}</p>
-            </div>
-            
-            <div class="ascii-link">
-                <a href="../blog.html">← back to blog</a>
-            </div>
-        </div>
-    </div>
-    
-    <script src="../ascii-art.js"></script>
-    <script src="../ascii-duck.js"></script>
-    <script src="../colors.js"></script>
-    <script src="../app.js"></script>
-</body>
-</html>`;
     }
     
     showMessage(message) {
