@@ -1,5 +1,5 @@
-const ContentDatabase = require('./database/database.js');
-const db = new ContentDatabase();
+require('dotenv').config();
+const SupabaseContentDatabase = require('./database/supabase-database.js');
 
 const command = process.argv[2];
 const type = process.argv[3];
@@ -16,52 +16,77 @@ Usage:
 Examples:
   node manage-content.js list journal
   node manage-content.js delete journal 12
+
+Note: Make sure your .env file contains SUPABASE_URL and SUPABASE_ANON_KEY
     `);
 }
 
-function listContent(contentType) {
-    if (contentType === 'journal') {
-        db.getAllPublishedJournals((err, items) => {
-            if (err) return console.error('Error:', err.message);
+async function listContent(contentType) {
+    const db = new SupabaseContentDatabase();
+    
+    try {
+        if (contentType === 'journal') {
+            const items = await db.getAllPublishedJournals();
             console.log(`--- Published Journals ---`);
-            items.forEach(item => console.log(`ID: ${item.id}, Title: ${item.title}`));
-            db.close();
-        });
-    } else {
-        console.log("Listing for this type is not implemented yet.");
+            if (items.length === 0) {
+                console.log('No published journals found.');
+            } else {
+                items.forEach(item => console.log(`ID: ${item.id}, Title: ${item.title}`));
+            }
+        } else {
+            console.log("Listing for this type is not implemented yet.");
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+    } finally {
         db.close();
     }
 }
 
-function deleteContent(contentType, contentId) {
+async function deleteContent(contentType, contentId) {
     if (!contentId) {
         console.error('Error: Please provide an ID to delete.');
-        db.close();
         return;
     }
 
-    if (contentType === 'journal') {
-        db.deleteJournal(contentId, function(err) {
-            if (err) return console.error('Error:', err.message);
-            if (this.changes === 0) {
+    const db = new SupabaseContentDatabase();
+    
+    try {
+        if (contentType === 'journal') {
+            // First check if the journal exists
+            const journal = await db.getJournal(parseInt(contentId, 10));
+            if (!journal) {
                 console.log(`No journal found with ID ${contentId}.`);
-            } else {
-                console.log(`Journal with ID ${contentId} has been deleted.`);
+                return;
             }
-            db.close();
-        });
-    } else {
-        console.log("Deletion for this type is not implemented yet.");
+            
+            // Delete the journal
+            await db.deleteJournal(parseInt(contentId, 10));
+            console.log(`Journal with ID ${contentId} has been deleted.`);
+        } else {
+            console.log("Deletion for this type is not implemented yet.");
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+    } finally {
         db.close();
     }
 }
 
-
-if (command === 'list') {
-    listContent(type);
-} else if (command === 'delete') {
-    deleteContent(type, id);
-} else {
-    printHelp();
-    db.close();
+async function main() {
+    try {
+        if (command === 'list') {
+            await listContent(type);
+        } else if (command === 'delete') {
+            await deleteContent(type, id);
+        } else {
+            printHelp();
+        }
+    } catch (error) {
+        console.error('Fatal error:', error.message);
+        process.exit(1);
+    }
 }
+
+// Run the script
+main();

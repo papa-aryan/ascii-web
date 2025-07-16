@@ -1,16 +1,16 @@
 {
   "name": "asciiweb",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "echo 'Static site - no build needed'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^5.1.0",
-    "sqlite3": "^5.1.7"
+    "@supabase/supabase-js": "^2.38.0",
+    "dotenv": "^16.3.1"
   }
 }
