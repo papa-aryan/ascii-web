@@ -178,6 +178,31 @@ class SupabaseContentDatabase {
     }
 
     /**
+     * Get a blog post by filename
+     * @param {string} filename - Blog post filename (without .html extension)
+     * @returns {Promise<Object|null>} - Blog post or null if not found
+     */
+    async getBlogPostByFilename(filename) {
+        const { data, error } = await this.supabase
+            .from(this.tableName)
+            .select('*')
+            .eq('filename', `${filename}.html`)
+            .eq('type', 'blog')
+            .eq('status', 'published')
+            .single();
+
+        if (error) {
+            if (error.code === 'PGRST116') {
+                // Not found
+                return null;
+            }
+            throw new Error(`Failed to get blog post by filename: ${error.message}`);
+        }
+
+        return data;
+    }
+
+    /**
      * Delete a published blog post
      * @param {number} id - Blog post ID
      * @returns {Promise<void>}
