@@ -49,10 +49,12 @@
                 this.errorMessage = document.getElementById('error-message');
                 
                 // Redirect if already logged in
-                if (this.authManager.isAuthenticated()) {
-                    window.location.href = '/writer.html';
-                    return;
-                }
+                (async () => {
+                    const isAuthenticated = await this.authManager.validateSession();
+                    if (isAuthenticated) {
+                        window.location.href = '/writer.html';
+                    }
+                })();
                 
                 this.initializeEventListeners();
             }

@@ -45,6 +45,17 @@ module.exports = async function handler(req, res) {
                     });
                 }
 
+            } else if (action === 'validate') {
+                // Handle session validation
+                const token = req.headers.authorization?.split(' ')[1];
+                const user = await authService.verifyAdminSession(token);
+
+                if (user) {
+                    res.status(200).json({ success: true, user });
+                } else {
+                    res.status(401).json({ success: false, error: 'Invalid session' });
+                }
+
             } else if (action === 'logout') {
                 // Handle logout
                 const result = await authService.signOut();

@@ -7,19 +7,18 @@ class BlogWriter {
         this.backLinkContainer = document.getElementById('back-link-container');
         this.currentDraftId = null;
         this.contentType = 'blog';
-        
-        // Initialize AuthManager
         this.authManager = new AuthManager();
-        
+    }
+
+    async initialize() {
         if (!this.titleInput) return;
-        
-        // Verify authentication before proceeding
-        if (!this.authManager.isAuthenticated()) {
+
+        const isAuthenticated = await this.authManager.validateSession();
+        if (!isAuthenticated) {
             window.location.href = '/login.html';
             return;
         }
-        
-        // Initialize with correct content type from URL
+
         this.initializeFromURL();
         this.initializeEventListeners();
         this.updateBackLink();
@@ -359,3 +358,10 @@ class BlogWriter {
         }, 3000);
     }
 }
+
+// Initialize the writer when the DOM is ready
+window.addEventListener('DOMContentLoaded', () => {
+    new App(); // Initialize common components
+    const writer = new BlogWriter();
+    writer.initialize();
+});

@@ -1,0 +1,9 @@
+i've just deployed this website via vercel to my own custom domain, and i have some issues with publishing blogposts through the deployed website. publishing posts works perfectly fine from a localhost, but when i do it through the deployed website i get the error popup saying "failed to publish". when i check the F12 console it says this:
+"
+Failed to load resource: the server responded with a status of 500 ()
+Publish error: Error: HTTP 500
+    at BlogWriter.publishPost (writer.js:296:23)
+"
+but the weird thing is that when i go back to /blog.html after having pressed published and got the error popup showing, this blog that i just tried to publish shows up in the list of blogposts in /blog.html. AND it also exists in the supabase database as a published post. but when i click on it, it directs me to a blank webpage saying "{"error":"Blog post not found"}". F12 console says "GET https://www.aryanx.club/blogposts/from-domain-please-no-error.html 404 (Not Found)".
+
+Analyze the codebase and the described bug rigorously. Generate a list of all possible reasons the issue could occur, including overlooked edge cases and assumptions. Cross-check code flow, variable states, data types, and external dependencies. Think out loud: verify each hypothesis before discarding it. Be thorough. Your goal is accuracy, not speed. IMPORTANT: Be extremely detail oriented and always follow OOP best practices and aim for robust and scalable code. Double-check all logic, syntax, and edge cases.
