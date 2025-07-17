@@ -1,4 +1,5 @@
 const SupabaseContentDatabase = require('../database/supabase-database');
+const AuthMiddleware = require('../lib/auth-middleware');
 
 let dbInstance = null;
 
@@ -9,7 +10,8 @@ function getDatabase() {
     return dbInstance;
 }
 
-module.exports = async function handler(req, res) {
+// Original handler function
+async function draftsHandler(req, res) {
     try {
         const db = getDatabase();
 
@@ -45,4 +47,7 @@ module.exports = async function handler(req, res) {
         console.error('API Error:', error);
         res.status(500).json({ error: error.message });
     }
-} 
+}
+
+// Export the protected handler
+module.exports = AuthMiddleware.withAdminAuth(draftsHandler); 

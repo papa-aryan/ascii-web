@@ -1,4 +1,5 @@
 const SupabaseContentDatabase = require('../../database/supabase-database');
+const AuthMiddleware = require('../../lib/auth-middleware');
 
 let dbInstance = null;
 
@@ -19,6 +20,7 @@ module.exports = async function handler(req, res) {
         }
 
         if (req.method === 'GET') {
+            // Public read access
             const journal = await db.getJournal(parseInt(id, 10));
             
             if (!journal) {
@@ -28,6 +30,16 @@ module.exports = async function handler(req, res) {
             res.status(200).json(journal);
             
         } else if (req.method === 'DELETE') {
+            // Admin-only delete - check auth manually
+            const authMiddleware = new AuthMiddleware();
+            const user = await authMiddleware.requireAdmin(req, res);
+            
+            // If auth failed, response was already sent
+            if (!user) {
+                return;
+            }
+
+            // Proceed with delete
             await db.deleteJournal(parseInt(id, 10));
             res.status(200).json({ success: true });
             
@@ -39,4 +51,4 @@ module.exports = async function handler(req, res) {
         console.error('API Error:', error);
         res.status(500).json({ error: error.message });
     }
-} 
+}; 

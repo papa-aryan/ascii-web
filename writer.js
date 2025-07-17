@@ -8,7 +8,16 @@ class BlogWriter {
         this.currentDraftId = null;
         this.contentType = 'blog';
         
+        // Initialize AuthManager
+        this.authManager = new AuthManager();
+        
         if (!this.titleInput) return;
+        
+        // Verify authentication before proceeding
+        if (!this.authManager.isAuthenticated()) {
+            window.location.href = '/login.html';
+            return;
+        }
         
         // Initialize with correct content type from URL
         this.initializeFromURL();
@@ -31,31 +40,26 @@ class BlogWriter {
     }
     
     /**
-     * Set the active tab in the UI based on content type
-     * @param {string} type - The content type ('blog' or 'journal')
+     * Set the active tab based on content type
      */
     setActiveTab(type) {
         document.querySelectorAll('.tab-button').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.type === type);
+            tab.classList.remove('active');
+            if (tab.dataset.type === type) {
+                tab.classList.add('active');
+            }
         });
     }
     
     /**
-     * Update the back link text and href based on current content type
+     * Switch content type and reload drafts
      */
-    updateBackLink() {
-        if (!this.backLinkContainer) return;
-        
-        const backLinkAnchor = this.backLinkContainer.querySelector('a');
-        if (!backLinkAnchor) return;
-        
-        if (this.contentType === 'journal') {
-            backLinkAnchor.textContent = '← back to journals';
-            backLinkAnchor.href = 'journal.html';
-        } else {
-            backLinkAnchor.textContent = '← back to blog';
-            backLinkAnchor.href = 'blog.html';
-        }
+    switchContentType(type) {
+        this.contentType = type;
+        this.setActiveTab(type);
+        this.updateBackLink();
+        this.loadDraftsList();
+        this.clearForm();
     }
     
     initializeEventListeners() {
@@ -78,32 +82,47 @@ class BlogWriter {
         document.getElementById('delete-draft').addEventListener('click', () => this.deleteDraft());
         document.getElementById('publish-post').addEventListener('click', () => this.publishPost());
         
+        // Logout button
+        document.getElementById('logout-button').addEventListener('click', () => this.logout());
+        
         // Auto-save every 30 seconds
         setInterval(() => this.autoSave(), 30000);
     }
-
-    switchContentType(type) {
-        // Update active tab
-        this.setActiveTab(type);
-        
-        this.contentType = type;
-        
-        // Update the back link to reflect current content type
-        this.updateBackLink();
-        
-        // Clear form when switching types
-        this.titleInput.value = '';
-        this.contentTextarea.value = '';
-        this.currentDraftId = null;
-        this.updatePreview();
-        
-        // Load drafts for the selected type
-        this.loadDraftsList();
+    
+    /**
+     * Handle logout
+     */
+    async logout() {
+        try {
+            await this.authManager.logout();
+            window.location.href = '/index.html';
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Force logout even if API call fails
+            window.location.href = '/index.html';
+        }
+    }
+    
+    /**
+     * Handle authentication errors
+     */
+    handleAuthError(error) {
+        console.error('Authentication error:', error);
+        this.showMessage('Session expired. Please log in again.');
+        setTimeout(() => {
+            window.location.href = '/login.html';
+        }, 2000);
     }
     
     async loadDraftsList() {
         try {
-            const response = await fetch(`/api/drafts?type=${this.contentType}`);
+            const response = await this.authManager.authenticatedFetch(`/api/drafts?type=${this.contentType}`);
+            
+            if (response.status === 401) {
+                this.handleAuthError('Unauthorized');
+                return;
+            }
+            
             const drafts = await response.json();
             
             // Clear and populate dropdown
@@ -116,21 +135,25 @@ class BlogWriter {
             });
         } catch (error) {
             console.error('Failed to load drafts:', error);
+            this.showMessage('Failed to load drafts');
         }
     }
     
     onDraftSelect() {
         const draftId = this.draftsSelect.value;
-        if (!draftId) {
-            // New draft
-            this.currentDraftId = null;
-            this.titleInput.value = '';
-            this.contentTextarea.value = '';
-            this.updatePreview();
-        } else {
-            // Load selected draft
+        if (draftId) {
             this.loadDraft(draftId);
+        } else {
+            this.clearForm();
         }
+    }
+    
+    clearForm() {
+        this.currentDraftId = null;
+        this.titleInput.value = '';
+        this.contentTextarea.value = '';
+        this.updatePreview();
+        this.draftsSelect.value = '';
     }
     
     async loadDraft(draftId) {
@@ -149,7 +172,13 @@ class BlogWriter {
     
     async getDraftsFromServer() {
         try {
-            const response = await fetch(`/api/drafts?type=${this.contentType}`);
+            const response = await this.authManager.authenticatedFetch(`/api/drafts?type=${this.contentType}`);
+            
+            if (response.status === 401) {
+                this.handleAuthError('Unauthorized');
+                return [];
+            }
+            
             return await response.json();
         } catch (error) {
             console.error('Failed to get drafts:', error);
@@ -164,7 +193,7 @@ class BlogWriter {
         if (!title && !content) return;
         
         try {
-            const response = await fetch('/api/drafts', {
+            const response = await this.authManager.authenticatedFetch('/api/drafts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -174,6 +203,11 @@ class BlogWriter {
                     type: this.contentType
                 })
             });
+            
+            if (response.status === 401) {
+                this.handleAuthError('Unauthorized');
+                return;
+            }
             
             const result = await response.json();
             if (result.success) {
@@ -191,9 +225,14 @@ class BlogWriter {
         
         if (confirm('Delete this draft?')) {
             try {
-                const response = await fetch(`/api/drafts/${this.currentDraftId}`, {
+                const response = await this.authManager.authenticatedFetch(`/api/drafts/${this.currentDraftId}`, {
                     method: 'DELETE'
                 });
+                
+                if (response.status === 401) {
+                    this.handleAuthError('Unauthorized');
+                    return;
+                }
                 
                 const result = await response.json();
                 if (result.success) {
@@ -211,36 +250,18 @@ class BlogWriter {
         }
     }
     
-    async autoSave() {
-        if ((this.titleInput.value.trim() || this.contentTextarea.value.trim()) && this.currentDraftId) {
-            await this.saveDraft();
+    autoSave() {
+        const title = this.titleInput.value.trim();
+        const content = this.contentTextarea.value.trim();
+        
+        if ((title || content) && this.hasUnsavedChanges()) {
+            this.saveDraft();
         }
     }
     
-    // Keep existing methods: updatePreview, publishPost, showMessage, etc.
-    updatePreview() {
-        const title = this.titleInput.value || 'Untitled Post';
-        let content = this.contentTextarea.value || 'Start writing...';
-        const currentDate = new Date().toISOString().split('T')[0];
-        
-        // Convert markdown formatting
-        content = this.parseMarkdown(content);
-
-        this.previewDiv.innerHTML = `
-            <h1>${title}</h1>
-            <div class="post-meta">
-                <span>posted: ${currentDate}</span>
-            </div>
-            <div class="post-body">
-                <p>${content}</p>
-            </div>
-        `;
-    }
-
-    parseMarkdown(text) {
-        return text
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');              // *italic*
+    hasUnsavedChanges() {
+        // Simple check - in a real app you'd compare with last saved state
+        return true;
     }
     
     async publishPost() {
@@ -260,11 +281,16 @@ class BlogWriter {
                 type: this.contentType
             };
             
-            const response = await fetch('/api/publish', {
+            const response = await this.authManager.authenticatedFetch('/api/publish', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestData)
             });
+
+            if (response.status === 401) {
+                this.handleAuthError('Unauthorized');
+                return;
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
@@ -285,22 +311,51 @@ class BlogWriter {
         }
     }
     
+    updatePreview() {
+        const title = this.titleInput.value;
+        const content = this.contentTextarea.value;
+        
+        const formattedContent = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\n/g, '<br>');
+        
+        this.previewDiv.innerHTML = title ? 
+            `<h2>${title}</h2><p>${formattedContent}</p>` : 
+            formattedContent;
+    }
+    
+    updateBackLink() {
+        if (this.backLinkContainer) {
+            const linkText = this.contentType === 'blog' ? '← back to blog' : '← back to journal';
+            const linkHref = this.contentType === 'blog' ? 'blog.html' : 'journal.html';
+            this.backLinkContainer.innerHTML = `<a href="${linkHref}">${linkText}</a>`;
+        }
+    }
+    
     showMessage(message) {
-        const messageDiv = document.createElement('div');
-        messageDiv.textContent = message;
-        messageDiv.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 255, 0, 0.2);
-            color: lime;
-            padding: 10px;
-            border: 1px solid lime;
-            font-family: 'Courier New', monospace;
-            z-index: 1000;
+        // Create a temporary message element
+        const messageEl = document.createElement('div');
+        messageEl.textContent = message;
+        messageEl.style.cssText = `
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            background: rgba(0, 255, 0, 0.1); 
+            border: 1px solid lime; 
+            color: lime; 
+            padding: 10px 20px; 
+            font-family: 'Courier New', monospace; 
+            z-index: 9999;
         `;
         
-        document.body.appendChild(messageDiv);
-        setTimeout(() => messageDiv.remove(), 3000);
+        document.body.appendChild(messageEl);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            if (messageEl.parentNode) {
+                messageEl.parentNode.removeChild(messageEl);
+            }
+        }, 3000);
     }
 }

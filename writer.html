@@ -32,6 +32,7 @@
                     <button id="save-draft">save draft</button>
                     <button id="delete-draft">delete draft</button>
                     <button id="publish-post">publish</button>
+                    <button id="logout-button">logout</button>
                 </div>
             </div>
         </div>
@@ -54,6 +55,14 @@
     <script src="ascii-art.js"></script>
     <script src="ascii-cat.js"></script>
     <script src="colors.js"></script>
+    <script src="lib/auth-manager.js"></script>
+    <script>
+        // Check authentication before loading anything else
+        const authManager = new AuthManager();
+        if (!authManager.requireAuth()) {
+            // User will be redirected to login
+        }
+    </script>
     <script src="writer.js"></script>
     <script src="app.js"></script>
 </body>

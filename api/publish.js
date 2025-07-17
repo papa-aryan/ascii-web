@@ -1,5 +1,6 @@
 const SupabaseContentDatabase = require('../database/supabase-database');
 const ContentPublisher = require('../lib/content-publisher');
+const AuthMiddleware = require('../lib/auth-middleware');
 
 let dbInstance = null;
 let publisherInstance = null;
@@ -18,7 +19,8 @@ function getPublisher() {
     return publisherInstance;
 }
 
-module.exports = async function handler(req, res) {
+// Original handler function
+async function publishHandler(req, res) {
     try {
         if (req.method !== 'POST') {
             res.setHeader('Allow', ['POST']);
@@ -47,4 +49,7 @@ module.exports = async function handler(req, res) {
         console.error('API Error:', error);
         res.status(500).json({ error: error.message });
     }
-} 
+}
+
+// Export the protected handler
+module.exports = AuthMiddleware.withAdminAuth(publishHandler); 

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>admin login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="cat-container">
+        <div id="cat"></div>
+    </div>
+    
+    <div class="menu-container">
+        <div class="menu-text">
+            <h2>admin login</h2>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <input type="email" id="email" placeholder="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="password" id="password" placeholder="password" required>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" id="login-button">login</button>
+                </div>
+            </form>
+            
+            <div id="error-message" style="display: none; color: red; margin-top: 10px;"></div>
+            
+            <div class="ascii-link"><a href="index.html">← back home</a></div>
+        </div>
+    </div>
+    
+    <script src="ascii-art.js"></script>
+    <script src="ascii-cat.js"></script>
+    <script src="colors.js"></script>
+    <script src="lib/auth-manager.js"></script>
+    <script>
+        class LoginPage {
+            constructor() {
+                this.authManager = new AuthManager();
+                this.form = document.getElementById('login-form');
+                this.emailInput = document.getElementById('email');
+                this.passwordInput = document.getElementById('password');
+                this.errorMessage = document.getElementById('error-message');
+                
+                // Redirect if already logged in
+                if (this.authManager.isAuthenticated()) {
+                    window.location.href = '/writer.html';
+                    return;
+                }
+                
+                this.initializeEventListeners();
+            }
+            
+            initializeEventListeners() {
+                this.form.addEventListener('submit', (e) => this.handleLogin(e));
+            }
+            
+            async handleLogin(e) {
+                e.preventDefault();
+                
+                const email = this.emailInput.value.trim();
+                const password = this.passwordInput.value.trim();
+                
+                if (!email || !password) {
+                    this.showError('Please enter both email and password');
+                    return;
+                }
+                
+                this.hideError();
+                const loginButton = document.getElementById('login-button');
+                loginButton.textContent = 'logging in...';
+                loginButton.disabled = true;
+                
+                try {
+                    const result = await this.authManager.login(email, password);
+                    
+                    if (result.success) {
+                        window.location.href = '/writer.html';
+                    } else {
+                        this.showError(result.error || 'Login failed');
+                    }
+                } catch (error) {
+                    this.showError('Network error');
+                } finally {
+                    loginButton.textContent = 'login';
+                    loginButton.disabled = false;
+                }
+            }
+            
+            showError(message) {
+                this.errorMessage.textContent = message;
+                this.errorMessage.style.display = 'block';
+            }
+            
+            hideError() {
+                this.errorMessage.style.display = 'none';
+            }
+        }
+        
+        // Initialize login page
+        window.addEventListener('DOMContentLoaded', () => {
+            new App(); // Initialize common components
+            new LoginPage();
+        });
+    </script>
+    <script src="app.js"></script>
+</body>
+</html> 
