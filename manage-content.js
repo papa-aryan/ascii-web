@@ -86,9 +86,7 @@ async function deleteContent(contentType, contentId) {
             
             // Delete the blog post
             await db.deleteBlogPost(parsedId);
-            console.log(`Blog post with ID ${contentId} has been deleted.`);
-            console.log(`Note: HTML file '${blogPost.filename}' may still exist in /blogposts folder.`);
-            
+            console.log(`Blog post with ID ${contentId} has been deleted.`);            
         } else {
             console.log("Supported types: 'blog' or 'journal'");
         }

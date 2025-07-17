@@ -211,6 +211,9 @@ h1, h2, h3, h4, h5, h6 {
     min-height: 200px;
     white-space: break-spaces;
     overflow-wrap: break-word;
+}
+
+#preview-content h2 {
     text-align: center;
 }
 
