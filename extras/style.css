@@ -17,17 +17,9 @@ body {
     margin-bottom: 40px;
 }
 
-.header-container h1 {
-    font-size: 2.5em;
-    margin: 0;
-    text-transform: lowercase;
-    letter-spacing: 2px;
-}
-
 .subtitle {
     font-size: 1.1em;
-    margin: 10px 0 0 0;
-    opacity: 0.8;
+    margin: 30px 0 0 0;
 }
 
 /* Projects Container */
@@ -48,7 +40,6 @@ body {
     border: 1px solid #00ff00;
     border-radius: 0;
     padding: 0;
-    transition: all 0.3s ease;
     background-color: transparent;
 }
 
@@ -92,7 +83,6 @@ body {
     font-size: 1.1em;
     padding: 10px 20px;
     border: 1px solid #00ff00;
-    transition: all 0.3s ease;
 }
 
 .back-link a:hover {
@@ -104,10 +94,6 @@ body {
 @media (max-width: 768px) {
     body {
         padding: 15px;
-    }
-    
-    .header-container h1 {
-        font-size: 2em;
     }
     
     .project-link {
