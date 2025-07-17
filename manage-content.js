@@ -15,7 +15,9 @@ Usage:
 
 Examples:
   node manage-content.js list journal
+  node manage-content.js list blog
   node manage-content.js delete journal 12
+  node manage-content.js delete blog 5
 
 Note: Make sure your .env file contains SUPABASE_URL and SUPABASE_ANON_KEY
     `);
@@ -33,8 +35,16 @@ async function listContent(contentType) {
             } else {
                 items.forEach(item => console.log(`ID: ${item.id}, Title: ${item.title}`));
             }
+        } else if (contentType === 'blog') {
+            const items = await db.getAllPublishedBlogPosts();
+            console.log(`--- Published Blog Posts ---`);
+            if (items.length === 0) {
+                console.log('No published blog posts found.');
+            } else {
+                items.forEach(item => console.log(`ID: ${item.id}, Title: ${item.title}, File: ${item.filename || 'N/A'}`));
+            }
         } else {
-            console.log("Listing for this type is not implemented yet.");
+            console.log("Supported types: 'blog' or 'journal'");
         }
     } catch (error) {
         console.error('Error:', error.message);
@@ -52,19 +62,35 @@ async function deleteContent(contentType, contentId) {
     const db = new SupabaseContentDatabase();
     
     try {
+        const parsedId = parseInt(contentId, 10);
+        
         if (contentType === 'journal') {
             // First check if the journal exists
-            const journal = await db.getJournal(parseInt(contentId, 10));
+            const journal = await db.getJournal(parsedId);
             if (!journal) {
                 console.log(`No journal found with ID ${contentId}.`);
                 return;
             }
             
             // Delete the journal
-            await db.deleteJournal(parseInt(contentId, 10));
+            await db.deleteJournal(parsedId);
             console.log(`Journal with ID ${contentId} has been deleted.`);
+            
+        } else if (contentType === 'blog') {
+            // First check if the blog post exists
+            const blogPost = await db.getBlogPost(parsedId);
+            if (!blogPost) {
+                console.log(`No blog post found with ID ${contentId}.`);
+                return;
+            }
+            
+            // Delete the blog post
+            await db.deleteBlogPost(parsedId);
+            console.log(`Blog post with ID ${contentId} has been deleted.`);
+            console.log(`Note: HTML file '${blogPost.filename}' may still exist in /blogposts folder.`);
+            
         } else {
-            console.log("Deletion for this type is not implemented yet.");
+            console.log("Supported types: 'blog' or 'journal'");
         }
     } catch (error) {
         console.error('Error:', error.message);

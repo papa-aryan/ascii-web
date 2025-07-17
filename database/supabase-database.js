@@ -108,6 +108,94 @@ class SupabaseContentDatabase {
     }
 
     /**
+     * Publish a blog post
+     * @param {string} title - Blog post title
+     * @param {string} content - Blog post content
+     * @param {string} filename - Generated HTML filename
+     * @returns {Promise<number>} - The ID of the published blog post
+     */
+    async publishBlogPost(title, content, filename) {
+        const { data, error } = await this.supabase
+            .from(this.tableName)
+            .insert([{
+                title,
+                content,
+                type: 'blog',
+                status: 'published',
+                filename: filename
+            }])
+            .select('id')
+            .single();
+
+        if (error) {
+            throw new Error(`Failed to publish blog post: ${error.message}`);
+        }
+
+        return data.id;
+    }
+
+    /**
+     * Get all published blog posts
+     * @returns {Promise<Array>} - Array of published blog posts
+     */
+    async getAllPublishedBlogPosts() {
+        const { data, error } = await this.supabase
+            .from(this.tableName)
+            .select('*')
+            .eq('status', 'published')
+            .eq('type', 'blog')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            throw new Error(`Failed to get published blog posts: ${error.message}`);
+        }
+
+        return data || [];
+    }
+
+    /**
+     * Get a specific blog post by ID
+     * @param {number} id - Blog post ID
+     * @returns {Promise<Object|null>} - Blog post or null if not found
+     */
+    async getBlogPost(id) {
+        const { data, error } = await this.supabase
+            .from(this.tableName)
+            .select('*')
+            .eq('id', id)
+            .eq('type', 'blog')
+            .single();
+
+        if (error) {
+            if (error.code === 'PGRST116') {
+                // Not found
+                return null;
+            }
+            throw new Error(`Failed to get blog post: ${error.message}`);
+        }
+
+        return data;
+    }
+
+    /**
+     * Delete a published blog post
+     * @param {number} id - Blog post ID
+     * @returns {Promise<void>}
+     */
+    async deleteBlogPost(id) {
+        const { error } = await this.supabase
+            .from(this.tableName)
+            .delete()
+            .eq('id', id)
+            .eq('type', 'blog')
+            .eq('status', 'published');
+
+        if (error) {
+            throw new Error(`Failed to delete blog post: ${error.message}`);
+        }
+    }
+
+    /**
      * Publish a journal entry
      * @param {string} title - Journal title
      * @param {string} content - Journal content
