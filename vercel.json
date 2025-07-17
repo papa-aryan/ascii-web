@@ -6,6 +6,21 @@
     {
       "source": "/",
       "destination": "/index.html"
+    },
+    {
+      "source": "/blogposts/(.*)\\.html",
+      "destination": "/api/serve-blog-post?filename=$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     }
   ]
-} 
+}
