@@ -6,7 +6,7 @@
     <title>blog</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="loading-page">
     <div class="duck-container">
         <div id="duck"></div>
     </div>
@@ -19,13 +19,16 @@
                 <!-- Blog posts will be loaded dynamically -->
             </div>
 
-            <div class="ascii-link"><a href="writer.html?type=blog">+ write new post</a></div>
+            <div class="ascii-link admin-only"><a href="writer.html?type=blog">+ new post</a></div>
             <div class="ascii-link"><a href="index.html">← back home</a></div>
         </div>
     </div>
     <script src="ascii-art.js"></script>
     <script src="ascii-duck.js"></script>
     <script src="colors.js"></script>
+    <script src="lib/auth-manager.js"></script>
+    <script src="lib/auth-checker.js"></script>
+    <script src="lib/page-load-manager.js"></script>
     <script src="lib/blog-loader.js"></script>
     <script src="app.js"></script>
 </body>

@@ -1,5 +1,6 @@
 class JournalManager {
-    constructor() {
+    constructor(pageLoadManager = null) {
+        this.pageLoadManager = pageLoadManager;
         this.createModalElement();
         this.initEventListeners();
         this.loadJournalsList();
@@ -56,6 +57,11 @@ class JournalManager {
         // Only run on the journal page
         if (!window.location.pathname.includes('journal.html')) return;
         
+        // Register this operation with the page load manager
+        if (this.pageLoadManager) {
+            this.pageLoadManager.addPendingOperation('journals-loading');
+        }
+
         try {
             // Fetch all published journals
             const response = await fetch('/api/journals');
@@ -64,26 +70,41 @@ class JournalManager {
             // Get the container to add links to
             const journalsContainer = document.querySelector('.journals-links');
             
-            if (journalsContainer && journals.length > 0) {
+            if (journalsContainer) {
                 journalsContainer.innerHTML = ''; // Clear any existing content
                 
-                // Add journal links
-                journals.forEach(journal => {
-                    const journalLink = document.createElement('div');
-                    journalLink.className = 'ascii-link';
-                    journalLink.innerHTML = `<a href="#" data-journal-id="${journal.id}">${journal.title}</a>`;
-                    
-                    // Add click event
-                    journalLink.querySelector('a').addEventListener('click', (e) => {
-                        e.preventDefault();
-                        this.openJournal(journal.id);
+                if (journals.length > 0) {
+                    // Add journal links
+                    journals.forEach(journal => {
+                        const journalLink = document.createElement('div');
+                        journalLink.className = 'ascii-link';
+                        journalLink.innerHTML = `<a href="#" data-journal-id="${journal.id}">${journal.title}</a>`;
+                        
+                        // Add click event
+                        journalLink.querySelector('a').addEventListener('click', (e) => {
+                            e.preventDefault();
+                            this.openJournal(journal.id);
+                        });
+                        
+                        journalsContainer.appendChild(journalLink);
                     });
-                    
-                    journalsContainer.appendChild(journalLink);
-                });
+                } else {
+                    journalsContainer.innerHTML = '<p>No journal entries yet.</p>';
+                }
             }
         } catch (error) {
             console.error('Failed to load journals:', error);
+            
+            // Fallback: show error message
+            const journalsContainer = document.querySelector('.journals-links');
+            if (journalsContainer) {
+                journalsContainer.innerHTML = '<p>Error loading journal entries.</p>';
+            }
+        } finally {
+            // Complete the journals loading operation
+            if (this.pageLoadManager) {
+                this.pageLoadManager.completePendingOperation('journals-loading');
+            }
         }
     }
     

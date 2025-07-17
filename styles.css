@@ -350,3 +350,31 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 5px;
     color: rgba(255, 255, 255, 0.5);
 }
+
+/* Authentication and loading states */
+.admin-only {
+    display: none !important;
+}
+
+.admin-only.authenticated {
+    display: block !important;
+}
+
+/* Page loading coordination */
+.loading-page .ascii-link {
+    display: none !important;
+}
+
+.loading-indicator {
+    color: #87CEEB;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.content-loading .ascii-link {
+    display: none;
+}
+
+.content-loading .loading-indicator {
+    display: block;
+}

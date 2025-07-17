@@ -6,7 +6,7 @@
     <title>journal</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="loading-page">
     <div class="menu-container">
         <div class="menu-text">
             <h1>journal</h1>
@@ -16,13 +16,16 @@
                 <!-- Journals links will be populated here by JavaScript -->
             </div>
             
-            <div class="ascii-link"><a href="writer.html?type=journal">+ write new journal</a></div>
+            <div class="ascii-link admin-only"><a href="writer.html?type=journal">+ new journal</a></div>
             <div class="ascii-link"><a href="index.html">← back home</a></div>
         </div>
     </div>
     
     <script src="ascii-art.js"></script>
     <script src="colors.js"></script>
+    <script src="lib/auth-manager.js"></script>
+    <script src="lib/auth-checker.js"></script>
+    <script src="lib/page-load-manager.js"></script>
     <script src="journal-manager.js"></script>
     <script src="app.js"></script>
 </body>
