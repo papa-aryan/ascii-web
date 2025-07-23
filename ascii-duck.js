@@ -9,7 +9,7 @@ class ASCIIDuck extends ASCIIArt {
     }
     
     getArt(flapping = false) {
-        const wing = flapping ? '/\\' : '__';
+        const wing = flapping ? '__' : '/\\';
         return `
 ${wing}
   <(o )___

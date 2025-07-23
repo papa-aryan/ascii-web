@@ -69,6 +69,15 @@ h1, h2, h3, h4, h5, h6 {
     color: rgb(200, 80, 255);
 }
 
+#journal-intro.journal-intro-active {
+    transition: transform 0.15s, cursor 0.15s;
+}
+
+#journal-intro.journal-intro-active:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
 .ascii-link a {
     text-decoration: none;
     color: inherit; 

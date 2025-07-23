@@ -51,6 +51,31 @@ class JournalManager {
                 this.closeModal();
             }
         });
+
+        this.initJournalIntro();
+    }
+
+    initJournalIntro() {
+        const introElement = document.getElementById('journal-intro');
+        if (!introElement) return;
+
+        const originalText = 'the inside of my brain.';
+        const tempText = 'thoughts, reflections, and jotted notes.<br>occasional diary type entries.';
+        
+        const handleClick = () => {
+            introElement.innerHTML = tempText;
+            introElement.classList.remove('journal-intro-active');
+            introElement.removeEventListener('click', handleClick);
+
+            setTimeout(() => {
+                introElement.innerHTML = originalText;
+                introElement.classList.add('journal-intro-active');
+                introElement.addEventListener('click', handleClick);
+            }, 3000);
+        };
+
+        introElement.classList.add('journal-intro-active');
+        introElement.addEventListener('click', handleClick);
     }
     
     async loadJournalsList() {
