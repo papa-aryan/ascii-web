@@ -28,6 +28,7 @@ async function publishHandler(req, res) {
         }
 
         const { title, content, type } = req.body;
+        const accessToken = req.accessToken; // Get token from auth middleware
 
         if (!title || !content || !type) {
             return res.status(400).json({ 
@@ -42,7 +43,7 @@ async function publishHandler(req, res) {
         }
 
         const publisher = getPublisher();
-        const result = await publisher.publish({ title, content, type });
+        const result = await publisher.publish({ title, content, type }, accessToken);
 
         res.status(200).json(result);
     } catch (error) {

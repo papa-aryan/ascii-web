@@ -39,8 +39,9 @@ module.exports = async function handler(req, res) {
                 return;
             }
 
-            // Proceed with delete
-            await db.deleteJournal(parseInt(id, 10));
+            // Proceed with delete using authenticated context
+            const accessToken = req.accessToken;
+            await db.deleteJournal(parseInt(id, 10), accessToken);
             res.status(200).json({ success: true });
             
         } else {

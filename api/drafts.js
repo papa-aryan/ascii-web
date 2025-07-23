@@ -14,11 +14,12 @@ function getDatabase() {
 async function draftsHandler(req, res) {
     try {
         const db = getDatabase();
+        const accessToken = req.accessToken; // Get token from auth middleware
 
         if (req.method === 'GET') {
             // Get drafts with optional type filter
             const type = req.query.type || null;
-            const drafts = await db.getDrafts(type);
+            const drafts = await db.getDrafts(type, accessToken);
             res.status(200).json(drafts);
             
         } else if (req.method === 'POST') {
@@ -31,11 +32,11 @@ async function draftsHandler(req, res) {
 
             if (id) {
                 // Update existing draft
-                await db.updateDraft(id, title, content, type);
+                await db.updateDraft(id, title, content, type, accessToken);
                 res.status(200).json({ success: true, id });
             } else {
                 // Create new draft
-                const newId = await db.saveDraft(title, content, type);
+                const newId = await db.saveDraft(title, content, type, accessToken);
                 res.status(201).json({ success: true, id: newId });
             }
             

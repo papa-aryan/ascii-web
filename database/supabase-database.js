@@ -6,6 +6,7 @@ class SupabaseContentDatabase {
             throw new Error('SUPABASE_URL and SUPABASE_ANON_KEY environment variables are required');
         }
         
+        // Default client for public operations
         this.supabase = createClient(
             process.env.SUPABASE_URL,
             process.env.SUPABASE_ANON_KEY
@@ -15,14 +16,42 @@ class SupabaseContentDatabase {
     }
 
     /**
-     * Save a new draft
+     * Create authenticated Supabase client for admin operations
+     * @param {string} accessToken - JWT access token from authenticated admin
+     * @returns {Object} - Authenticated Supabase client
+     */
+    getAuthenticatedClient(accessToken) {
+        if (!accessToken) {
+            throw new Error('Access token required for admin operations');
+        }
+
+        const authenticatedClient = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_ANON_KEY,
+            {
+                global: {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`
+                    }
+                }
+            }
+        );
+
+        return authenticatedClient;
+    }
+
+    /**
+     * Save a new draft (Admin operation)
      * @param {string} title - Post title
      * @param {string} content - Post content  
      * @param {string} type - Content type ('blog' or 'journal')
+     * @param {string} accessToken - JWT access token from authenticated admin
      * @returns {Promise<number>} - The ID of the created draft
      */
-    async saveDraft(title, content, type = 'blog') {
-        const { data, error } = await this.supabase
+    async saveDraft(title, content, type = 'blog', accessToken = null) {
+        const client = accessToken ? this.getAuthenticatedClient(accessToken) : this.supabase;
+        
+        const { data, error } = await client
             .from(this.tableName)
             .insert([{
                 title,
@@ -41,12 +70,15 @@ class SupabaseContentDatabase {
     }
 
     /**
-     * Get drafts, optionally filtered by type
+     * Get drafts, optionally filtered by type (Admin operation)
      * @param {string|null} type - Optional content type filter
+     * @param {string} accessToken - JWT access token from authenticated admin
      * @returns {Promise<Array>} - Array of draft posts
      */
-    async getDrafts(type = null) {
-        let query = this.supabase
+    async getDrafts(type = null, accessToken = null) {
+        const client = accessToken ? this.getAuthenticatedClient(accessToken) : this.supabase;
+        
+        let query = client
             .from(this.tableName)
             .select('*')
             .eq('status', 'draft')
@@ -66,15 +98,18 @@ class SupabaseContentDatabase {
     }
 
     /**
-     * Update an existing draft
+     * Update an existing draft (Admin operation)
      * @param {number} id - Draft ID
      * @param {string} title - Updated title
      * @param {string} content - Updated content
      * @param {string} type - Content type
+     * @param {string} accessToken - JWT access token from authenticated admin
      * @returns {Promise<void>}
      */
-    async updateDraft(id, title, content, type = 'blog') {
-        const { error } = await this.supabase
+    async updateDraft(id, title, content, type = 'blog', accessToken = null) {
+        const client = accessToken ? this.getAuthenticatedClient(accessToken) : this.supabase;
+        
+        const { error } = await client
             .from(this.tableName)
             .update({
                 title,
@@ -91,12 +126,15 @@ class SupabaseContentDatabase {
     }
 
     /**
-     * Delete a draft
+     * Delete a draft (Admin operation)
      * @param {number} id - Draft ID
+     * @param {string} accessToken - JWT access token from authenticated admin
      * @returns {Promise<void>}
      */
-    async deleteDraft(id) {
-        const { error } = await this.supabase
+    async deleteDraft(id, accessToken = null) {
+        const client = accessToken ? this.getAuthenticatedClient(accessToken) : this.supabase;
+        
+        const { error } = await client
             .from(this.tableName)
             .delete()
             .eq('id', id)
@@ -108,14 +146,17 @@ class SupabaseContentDatabase {
     }
 
     /**
-     * Publish a blog post
+     * Publish a blog post (Admin operation)
      * @param {string} title - Blog post title
      * @param {string} content - Blog post content
      * @param {string} filename - Generated HTML filename
+     * @param {string} accessToken - JWT access token from authenticated admin
      * @returns {Promise<number>} - The ID of the published blog post
      */
-    async publishBlogPost(title, content, filename) {
-        const { data, error } = await this.supabase
+    async publishBlogPost(title, content, filename, accessToken = null) {
+        const client = accessToken ? this.getAuthenticatedClient(accessToken) : this.supabase;
+        
+        const { data, error } = await client
             .from(this.tableName)
             .insert([{
                 title,
@@ -203,12 +244,15 @@ class SupabaseContentDatabase {
     }
 
     /**
-     * Delete a published blog post
+     * Delete a published blog post (Admin operation)
      * @param {number} id - Blog post ID
+     * @param {string} accessToken - JWT access token from authenticated admin
      * @returns {Promise<void>}
      */
-    async deleteBlogPost(id) {
-        const { error } = await this.supabase
+    async deleteBlogPost(id, accessToken = null) {
+        const client = accessToken ? this.getAuthenticatedClient(accessToken) : this.supabase;
+        
+        const { error } = await client
             .from(this.tableName)
             .delete()
             .eq('id', id)
@@ -221,13 +265,16 @@ class SupabaseContentDatabase {
     }
 
     /**
-     * Publish a journal entry
+     * Publish a journal entry (Admin operation)
      * @param {string} title - Journal title
      * @param {string} content - Journal content
+     * @param {string} accessToken - JWT access token from authenticated admin
      * @returns {Promise<number>} - The ID of the published journal
      */
-    async publishJournal(title, content) {
-        const { data, error } = await this.supabase
+    async publishJournal(title, content, accessToken = null) {
+        const client = accessToken ? this.getAuthenticatedClient(accessToken) : this.supabase;
+        
+        const { data, error } = await client
             .from(this.tableName)
             .insert([{
                 title,
@@ -289,12 +336,15 @@ class SupabaseContentDatabase {
     }
 
     /**
-     * Delete a published journal
+     * Delete a published journal (Admin operation)
      * @param {number} id - Journal ID
+     * @param {string} accessToken - JWT access token from authenticated admin
      * @returns {Promise<void>}
      */
-    async deleteJournal(id) {
-        const { error } = await this.supabase
+    async deleteJournal(id, accessToken = null) {
+        const client = accessToken ? this.getAuthenticatedClient(accessToken) : this.supabase;
+        
+        const { error } = await client
             .from(this.tableName)
             .delete()
             .eq('id', id)

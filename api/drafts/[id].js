@@ -15,13 +15,14 @@ async function deleteDraftHandler(req, res) {
     try {
         const db = getDatabase();
         const { id } = req.query;
+        const accessToken = req.accessToken; // Get token from auth middleware
 
         if (!id) {
             return res.status(400).json({ error: 'Draft ID is required' });
         }
 
         if (req.method === 'DELETE') {
-            await db.deleteDraft(parseInt(id, 10));
+            await db.deleteDraft(parseInt(id, 10), accessToken);
             res.status(200).json({ success: true });
             
         } else {
