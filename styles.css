@@ -9,7 +9,14 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Courier New', monospace;
-    font-weight: normal;
+    font-weight: bold;
+}
+
+.reference {
+    font-size: 0.7em;
+    vertical-align: super;
+    color: #000000;
+    margin-left: 0.5px;
 }
 
 .cat-container {
@@ -88,7 +95,6 @@ h1, h2, h3, h4, h5, h6 {
     cursor: pointer;
     transform: scale(1.26);
     transition: transform 0.2s ease;
-
 }
 
 /* blogpost css */

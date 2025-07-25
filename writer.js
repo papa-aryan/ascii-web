@@ -315,6 +315,7 @@ class BlogWriter {
         const content = this.contentTextarea.value;
         
         const formattedContent = content
+            .replace(/\^\[(\d+)\]/g, '<sup class="reference">[$1]</sup>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
             .replace(/\n/g, '<br>');
