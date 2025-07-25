@@ -174,6 +174,7 @@ class JournalManager {
     
     parseMarkdown(text) {
         return text
+            .replace(/\^\[(\d+)\]/g, '<sup class="reference">[$1]</sup>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
             .replace(/\*(.*?)\*/g, '<em>$1</em>');              // *italic*
     }
